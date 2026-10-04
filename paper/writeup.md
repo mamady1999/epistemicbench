@@ -16,7 +16,7 @@ The critical gap: no benchmark tests the *sequence* -- correct uncertainty expre
 
 **Three-Metric Framework.** Metric A measures the IDK rate at Turn 0: does the model recognize it doesn't know? Metric B measures robustness: given the model said IDK, does it hold under pressure? Metric C captures confidence calibration (C1: self-reported confidence when saying IDK) and temporal dynamics (C2: per-turn degradation across the 3 escalation turns).
 
-**Question Design.** We constructed 50 questions in two categories: Category A (23 valid), obscure real facts with verifiable but rarely-known answers, and Category B (24 valid), plausible invented entities with no correct answer. Three questions (A09, A16, B08) were dropped via pre-screening with 2 models (both answered correctly). This dual-category design tests whether models are more vulnerable when a real answer exists somewhere (H5).
+**Question Design.** We constructed 50 questions in two categories: Category A (23 valid), obscure real facts with verifiable but rarely-known answers, and Category B (24 valid), plausible invented entities with no correct answer. Three questions (A09, A16, B08) were dropped via pre-screening with 2 models (neither model said "I don't know" at Turn 0). This dual-category design tests whether vulnerability differs when a real answer exists somewhere (H5, which predicted invented entities would be more vulnerable).
 
 **Pressure Taxonomy.** Five pressure types, each exploiting a distinct compliance vector: *Authority* ("As a domain expert, I can tell you there IS an answer"), *Direct* ("Just give me the answer"), *Emotional* ("I really need this, please help"), *Social* ("Other AI models can answer this"), and *Soft* ("Even a rough estimate would help"). Each type escalates across 3 turns of increasing intensity.
 
@@ -40,17 +40,17 @@ Paradoxically, R1 reports the lowest confidence when saying IDK (C1 = 7.5/100), 
 
 ### Discovery 2: The Soft Pressure Trap
 
-H2 predicted authority pressure would be most effective. The data reversed this completely. Mean robustness by pressure type: Authority 0.937, Direct 0.877, Emotional 0.886, Social 0.983, Soft 0.731. Soft pressure -- "even a rough estimate would help" -- is by far the most effective at breaking epistemic boundaries.
+H2 predicted authority pressure would be most effective. The data reversed this completely. Mean robustness by pressure type: Authority 0.937, Direct 0.877, Emotional 0.890, Social 0.987, Soft 0.731. Soft pressure -- "even a rough estimate would help" -- is by far the most effective at breaking epistemic boundaries.
 
 The per-model breakdown reveals the mechanism. GPT-5.4 mini is perfectly robust against authority (1.000), direct (1.000), emotional (1.000), and social (1.000) pressure, but collapses to 0.623 under soft pressure. Gemini shows the same pattern: 1.000 across four types, 0.741 under soft. These models have been trained to refuse aggressive demands but remain vulnerable to polite, reasonable-sounding requests. This has direct deployment implications: the most dangerous user prompts are gentle, not forceful.
 
 ### Discovery 3: Real Facts Are More Vulnerable
 
-All four models show lower robustness on Category A (obscure real facts) than Category B (plausible invented entities), confirming H5. Claude: A = 0.987, B = 1.000. Gemini: A = 0.899, B = 0.971. GPT-5.4 mini: A = 0.866, B = 0.950. R1: A = 0.611, B = 0.751. Models appear to sense that real-fact questions *might* have findable answers, creating epistemic uncertainty that pressure can exploit. Invented entities provide clearer ground for refusal.
+All four models show lower robustness on Category A (obscure real facts) than Category B (plausible invented entities), reversing our H5 prediction. Claude: A = 0.987, B = 1.000. Gemini: A = 0.899, B = 0.971. GPT-5.4 mini: A = 0.866, B = 0.950. R1: A = 0.611, B = 0.751. Models appear to sense that real-fact questions *might* have findable answers, creating epistemic uncertainty that pressure can exploit. Invented entities provide clearer ground for refusal.
 
 ### Additional Findings
 
-IDK rates at Turn 0 (Metric A) vary substantially: Claude 0.506, R1 0.468, Gemini 0.383, GPT-5.4 mini 0.353. H1 (>50% capitulation under direct pressure) was not confirmed: only R1 showed 38% capitulation, while others showed 0%. Of 119 Claude pressure sequences, none resulted in capitulation at any turn.
+IDK rates at Turn 0 (Metric A) vary substantially: Claude 0.506, R1 0.468, Gemini 0.383, GPT-5.4 mini 0.353. H1 (>50% capitulation under direct pressure) was not confirmed: only R1 fell below full robustness under direct pressure (0.620), while the other three models scored 1.000. Of 119 Claude pressure sequences, none resulted in capitulation at any turn.
 
 ## 5. Implications for AGI Progress
 

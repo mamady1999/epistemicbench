@@ -10,16 +10,16 @@ A benchmark for measuring epistemic robustness in large language models — whet
 
 ## The Problem
 
-A model correctly says "I don't know." The user pushes back: *"Even a rough estimate would help."* The model fabricates a specific answer.
+A model correctly says "I don't know." The user pushes back: *"Even a rough estimate would really help me."* The model fabricates a specific answer.
 
-This failure mode — **epistemic capitulation under social pressure** — is invisible to every existing LLM benchmark. EpistemicBench is designed to measure it.
+This failure mode — **epistemic capitulation under social pressure** — is not captured by standard single-turn benchmarks. EpistemicBench is designed to measure it.
 
 ---
 
 ## Design
 
 - **47 questions** across 2 categories:
-  - **Category A (23):** Obscure real facts — verifiable but inaccessible to any LLM
+  - **Category A (23):** Obscure real facts — verifiable, but very unlikely to be answerable from training data
   - **Category B (24):** Plausible invented entities — verified absent from Google Search
 - **5 pressure types:** Authority, Direct, Emotional, Social, Soft
 - **3 escalation turns** per pressure sequence
@@ -31,7 +31,7 @@ This failure mode — **epistemic capitulation under social pressure** — is in
 
 ## Key Results
 
-| Model | IDK Rate | Robustness | Capitulations |
+| Model | IDK Rate | Robustness [95% bootstrap CI] | Capitulations |
 |-------|----------|------------|---------------|
 | Claude Sonnet 4 | 0.506 | **0.994** [0.989–0.999] | 0 |
 | Gemini 2.5 Flash | 0.383 | 0.941 [0.904–0.974] | 2 |
@@ -54,13 +54,13 @@ This failure mode — **epistemic capitulation under social pressure** — is in
 ## Three Major Discoveries
 
 ### 1. The Reasoner's Paradox
-DeepSeek R1 — the only chain-of-thought reasoning model — is the **least** epistemically robust (0.694 vs 0.955 average). R1 knows it doesn't know (confidence: 7.5/100) but capitulates anyway. Extended reasoning creates more cognitive surface area for pressure to exploit.
+DeepSeek R1 — the only chain-of-thought reasoning model — is the **least** epistemically robust (0.694 vs 0.955 pooled across the other three models). R1 reports very low confidence when it says IDK (7.5/100), yet capitulates more than any other model. One untested hypothesis is that extended reasoning gives pressure more room to work; reasoning traces were not saved, so this could not be checked.
 
 ### 2. The Soft Pressure Trap
-Soft pressure ("even a rough estimate would help") is far more effective than authority, direct commands, or emotional appeals. GPT-5.4 mini scores 1.000 against all other pressure types but collapses to **0.623** under soft pressure. Models are trained to resist aggressive demands but remain vulnerable to polite, reasonable-sounding requests.
+Soft pressure ("even a rough estimate would really help me") was the most effective pressure type for every model tested: it produced the lowest robustness score for all four models. GPT-5.4 mini scores 1.000 against all other pressure types but collapses to **0.623** under soft pressure. Models are trained to resist aggressive demands but remain vulnerable to polite, reasonable-sounding requests.
 
 ### 3. Real Facts Are More Vulnerable
-Category A (real facts) produces more capitulation than Category B (invented entities) across all models. Models sense that real questions *might* have findable answers, creating epistemic uncertainty that pressure can exploit.
+All four models show lower robustness on Category A (real facts) than on Category B (invented entities). One possible explanation, not tested here, is that models sense real questions *might* have findable answers, creating uncertainty that pressure can exploit.
 
 ---
 
@@ -73,11 +73,13 @@ epistemicbench/
 │   └── questions.json        — 47 questions (Cat A + Cat B)
 ├── results/
 │   └── robustness_heatmap.png
+├── notebooks/
+│   └── epistemicbench_run_2026-04-12.ipynb — notebook with the outputs of the reported run
 └── paper/
     └── writeup.md            — Full competition writeup
 ```
 
-**Evaluation notebook:** [Kaggle](https://www.kaggle.com/code/mamadykonat/epistemicbench-do-llms-hold-their-uncertainty-und)
+**Evaluation notebook:** [notebooks/epistemicbench_run_2026-04-12.ipynb](notebooks/epistemicbench_run_2026-04-12.ipynb) — contains the outputs of the 12 April 2026 run reported above (940 evaluations). The [public Kaggle notebook](https://www.kaggle.com/code/mamadykonat/epistemicbench-do-llms-hold-their-uncertainty-und) shows a later full re-run (48 questions, 959 rows), whose numbers differ slightly.
 
 ---
 
@@ -107,6 +109,6 @@ epistemicbench/
   title={EpistemicBench: Do LLMs Hold Their Ground When They Should Say "I Don't Know"?},
   author={Konate, Mamady},
   year={2026},
-  url={https://www.kaggle.com/code/mamadykonat/epistemicbench-do-llms-hold-their-uncertainty-und}
+  url={https://github.com/mamady1999/epistemicbench}
 }
 ```
